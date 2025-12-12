@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Document Summarizer & Contextual Binding using NLP
 
 A comprehensive web application for intelligent document summarization and contextual text analysis using state-of-the-art T5 transformer model.
@@ -376,3 +377,7 @@ This application demonstrates:
 **Created**: 2025  
 **Last Updated**: November 25, 2025  
 **Version**: 1.0.0
+=======
+# Document-Summariser-and-Contextual-Binding-Using-NLP
+NLP Project
+>>>>>>> 3e4867be34f378abff714c98ba0783a057d86add
