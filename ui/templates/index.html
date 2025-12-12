@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Summarizer & Contextual Binding</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1>📄 Document Summarizer</h1>
+                <p class="subtitle">Intelligent Text Summarization & Contextual Analysis</p>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="nav-tabs">
+            <button class="nav-btn active" onclick="switchTab(this, 'summarizer')">
+                ✨ Summarizer
+            </button>
+            <button class="nav-btn" onclick="switchTab(this, 'chatbot')">
+                💬 Chatbot
+            </button>
+            <button class="nav-btn" onclick="switchTab(this, 'history')">
+                📚 History
+            </button>
+            <button class="nav-btn" onclick="switchTab(this, 'about')">
+                ℹ️ About
+            </button>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Summarizer Tab -->
+            <div id="summarizer" class="tab-content active">
+                <div class="section-card">
+                    <h2>Quick Summarization</h2>
+                    
+                    <div class="form-group">
+                        <label for="inputText">Enter Your Document:</label>
+                        <textarea 
+                            id="inputText" 
+                            class="input-textarea"
+                            placeholder="Paste your document here... (minimum 50 words)"
+                            rows="8"
+                        ></textarea>
+                        <div class="text-info" id="textInfo">
+                            <span>Words: <strong>0</strong></span>
+                            <span>Reading Time: <strong>0</strong> min</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="contextInput">Optional Context:</label>
+                        <textarea 
+                            id="contextInput" 
+                            class="input-textarea"
+                            placeholder="Enter context or topic (optional)"
+                            rows="3"
+                        ></textarea>
+                    </div>
+
+                    <div class="button-group">
+                        <button class="btn btn-primary" onclick="summarizeText()">
+                            📝 Summarize
+                        </button>
+                        <button class="btn btn-secondary" onclick="clearSummarizer()">
+                            🗑️ Clear
+                        </button>
+                    </div>
+
+                    <div id="loadingIndicator" class="loading" style="display: none;">
+                        <div class="spinner"></div>
+                        <p>Processing your document...</p>
+                    </div>
+                </div>
+
+                <!-- Results Section -->
+                <div id="resultsSection" class="section-card" style="display: none;">
+                    <h2>Summarization Results</h2>
+                    
+                    <div class="result-box">
+                        <h3>📋 Summary</h3>
+                        <p id="summaryOutput" class="summary-text"></p>
+                    </div>
+
+                    <div class="result-columns">
+                        <div class="result-box half">
+                            <h3>🔑 Keywords</h3>
+                            <div id="keywordsOutput" class="keywords-container"></div>
+                        </div>
+
+                        <div class="result-box half">
+                            <h3>📊 Statistics</h3>
+                            <ul id="statsOutput" class="stats-list"></ul>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button class="btn btn-secondary" onclick="copySummary()">
+                            📋 Copy Summary
+                        </button>
+                        <button class="btn btn-secondary" onclick="downloadSummary()">
+                            ⬇️ Download
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chatbot Tab -->
+            <div id="chatbot" class="tab-content">
+                <div class="section-card">
+                    <h2>Contextual Q&A Chatbot</h2>
+                    
+                    <div class="form-group">
+                        <label for="chatbotText">Load Document for Q&A:</label>
+                        <textarea 
+                            id="chatbotText" 
+                            class="input-textarea"
+                            placeholder="Paste document here for question answering..."
+                            rows="6"
+                        ></textarea>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="loadChatbotDocument()">
+                        📥 Load Document
+                    </button>
+
+                    <div id="chatbotStatus" class="status-message" style="display: none;"></div>
+                </div>
+
+                <!-- Chat Interface -->
+                <div id="chatInterface" class="section-card" style="display: none;">
+                    <h2>Ask Questions</h2>
+                    
+                    <div class="chat-container">
+                        <div id="chatHistory" class="chat-history"></div>
+                    </div>
+
+                    <div class="chat-input-group">
+                        <input 
+                            type="text" 
+                            id="chatQuestion" 
+                            class="chat-input"
+                            placeholder="Ask a question about the document..."
+                            onkeypress="handleChatKeypress(event)"
+                        >
+                        <button class="btn btn-primary" onclick="askQuestion()">
+                            Send
+                        </button>
+                    </div>
+
+                    <button class="btn btn-secondary" onclick="unloadChatbot()">
+                        🔄 Load Different Document
+                    </button>
+                </div>
+            </div>
+
+            <!-- History Tab -->
+            <div id="history" class="tab-content">
+                <div class="section-card">
+                    <h2>Summarization History</h2>
+                    
+                    <div class="button-group">
+                        <input 
+                            type="text" 
+                            id="searchKeyword" 
+                            class="search-input"
+                            placeholder="Search history..."
+                        >
+                        <button class="btn btn-secondary" onclick="searchHistory()">
+                            🔍 Search
+                        </button>
+                        <button class="btn btn-danger" onclick="clearAllHistory()">
+                            🗑️ Clear History
+                        </button>
+                    </div>
+                </div>
+
+                <div id="historyContainer" class="history-container"></div>
+            </div>
+
+            <!-- About Tab -->
+            <div id="about" class="tab-content">
+                <div class="section-card">
+                    <h2>About This Application</h2>
+                    
+                    <div class="about-content">
+                        <h3>🎯 Features</h3>
+                        <ul class="feature-list">
+                            <li><strong>Document Summarization:</strong> Automatically generate concise summaries of long documents</li>
+                            <li><strong>Contextual Binding:</strong> Enhance summaries with optional context information</li>
+                            <li><strong>Keyword Extraction:</strong> Identify key terms and concepts from documents</li>
+                            <li><strong>Q&A Chatbot:</strong> Ask questions about loaded documents and get contextual answers</li>
+                            <li><strong>Text Analysis:</strong> Get detailed statistics about your documents</li>
+                            <li><strong>History Management:</strong> Keep track of all your summarizations</li>
+                        </ul>
+
+                        <h3>🔧 Technology Stack</h3>
+                        <ul class="tech-list">
+                            <li>Backend: Flask (Python)</li>
+                            <li>NLP Model: T5 Transformer</li>
+                            <li>Libraries: Transformers, PyTorch, NLTK</li>
+                            <li>Frontend: HTML5, CSS3, Vanilla JavaScript</li>
+                        </ul>
+
+                        <h3>📖 How to Use</h3>
+                        <ol class="instruction-list">
+                            <li>Go to the <strong>Summarizer</strong> tab</li>
+                            <li>Paste your document in the text area</li>
+                            <li>Optionally add context for better results</li>
+                            <li>Click <strong>Summarize</strong> and wait for results</li>
+                            <li>Use the <strong>Chatbot</strong> tab to ask questions about documents</li>
+                            <li>Check <strong>History</strong> to view previous summarizations</li>
+                        </ol>
+
+                        <h3>📊 Supported Document Types</h3>
+                        <p>Plain text documents, articles, research papers, news articles, and any other text-based content.</p>
+
+                        <h3>⚠️ Limitations</h3>
+                        <ul class="limitation-list">
+                            <li>Maximum input length: 512 tokens (~2000 words)</li>
+                            <li>Summary length: 30-200 tokens (~100-800 words)</li>
+                            <li>Processing time depends on document length</li>
+                            <li>Best results with English language documents</li>
+                        </ul>
+
+                        <h3>👨‍💻 Development</h3>
+                        <p>Built with Flask and state-of-the-art NLP models for accurate and contextual document summarization.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2025 Document Summarizer & Contextual Binding. All rights reserved.</p>
+            <p><small>Powered by T5 Transformer Model</small></p>
+        </footer>
+    </div>
+
+    <!-- Notification Component -->
+    <div id="notification" class="notification"></div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
